@@ -1,0 +1,29 @@
+function [beto]=beta_equation(V1,gamma1,psichi2,psipt2,psirt2)
+% Solving Alpha Equation  
+
+[m,Sref,Lref,bref]=constants;
+[T] = inertia; Ix = T(1,1); Iz = T(3,3); Ixz = T(1,3); II = (Ix*Iz-Ixz^2);
+
+syms betav
+dCy1 =-0.1038 + 0.0598*betav;
+dCn1 = 0.1080 - 0.0240*betav;
+dCl1 = 0.0000;
+
+dCy2 = -0.1038;
+dCn2 = -0.0240;
+dCl2 =  0.0000;
+
+% Alpha Equation f(alpha)
+f = psichi2*(dCy1/(V1*cos(gamma1)))+psipt2*((m*bref/II)*(Iz*dCl1+Ixz*...
+    dCn1))+psirt2*((m*bref/(Iz*II))*(dCn1*II+Ixz*(dCl1*Iz+dCn1*Ixz)));
+
+% Equation f_dot(alpha)
+f_dot = psichi2*(dCy2/(V1*cos(gamma1)))+psipt2*((m*bref/II)*(Iz*dCl2+Ixz*...
+    dCn2))+psirt2*((m*bref/(Iz*II))*(dCn2*II+Ixz*(dCl2*Iz+dCn2*Ixz)));
+
+N = 1000; % ? of Iterations
+err = 0.001; x0 = 0.1;
+beto = NRaphsonb(f,f_dot,N,err,x0);
+arc = pi/180;
+if beto <= (-10)*arc, beto = -10*arc; end
+if beto >= (+10)*arc, beto = +10*arc; end

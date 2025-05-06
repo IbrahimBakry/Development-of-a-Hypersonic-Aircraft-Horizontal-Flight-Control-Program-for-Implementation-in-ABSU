@@ -1,8 +1,12 @@
 % ********************************************************
 % Function "Initialb" Generates Intitial Data for Omega
 % ********************************************************
-function [omb,ome]=initialb(u1,v1,w1,phis1,thetas1,psis1,h1,phi1,theta1,omegae)
-[m,Sref,Lref,rhos,gs,bet,omegae,rearth,V00,alX,CmX,CLX,CDX,b1X,CyX,CnX]=constants;
+
+function [omb,ome]...
+=initialb(u1,v1,w1,phis1,thetas1,psis1,h1,phi1,theta1,omegae);
+
+[m,Sref,Lref,rhos,gs,bet,omegae,rearth,V00,alX,CmX,...
+    CLX,CDX,b1X,CyX,CnX]=constants;
 
 % ********************************************************
 % Matrix Transforming from Geodetic to Body Fixed System
@@ -11,8 +15,8 @@ function [omb,ome]=initialb(u1,v1,w1,phis1,thetas1,psis1,h1,phi1,theta1,omegae)
 Vabs=sqrt(u1.*u1+v1.*v1+w1.*w1);
 rg1 = h1 + rearth;
 
-Mg(1,1) = cos(psis1)*cos(thetas1);   % phis1 = phi', thetas1 = theta',
-Mg(1,2) = sin(psis1)*cos(thetas1);   % psis1 = psi'
+Mg(1,1) = cos(psis1)*cos(thetas1);
+Mg(1,2) = sin(psis1)*cos(thetas1);
 Mg(1,3) =-sin(thetas1);
 Mg(2,1) = sin(phis1)*sin(thetas1)*cos(psis1) - cos(phis1)*sin(psis1);
 Mg(2,2) = sin(phis1)*sin(thetas1)*sin(psis1) + cos(phis1)*cos(psis1);
@@ -46,7 +50,7 @@ theta1p = Vabs*cos(gamma)*sin(chi)/(rg1*cos(phi1));
 
 om2(1)  = theta1p*cos(phi1);
 om2(2)  =-phi1p;
-om2(3)  =-theta1p*sin(phi1); % phi1 = phi
+om2(3)  =-theta1p*sin(phi1);
 
 ome     = Mg*om2';
 

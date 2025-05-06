@@ -1,0 +1,36 @@
+%%% Conditions of Alpha Controling
+
+% V,Iy,rho,g,gamma,alpha,R,phi,psiu,psiw,psiqt,Cx,Cz,Cm
+% dalpha, 
+
+[m,Sref,Lref,rhos,gs,bet,omegae,rearth,V00,alX,CmX,...
+          CLX,CDX,b1X,CyX,CnX]=constants;
+[T] = inertia; Iy = T(2,2);
+
+[Maero,Vabs,Mg,alfa,beta]...
+=matrices(u1,v1,w1,phis1,thetas1,psis1);      
+
+% Solving Alpha Equation
+% Alpha Equation f(alpha)
+F1 = (m/(0.5*rho*V^2*Sref))*(g*cos(gamma+alpha)+R*omegae^2*(cos(phi)^2*...
+    cos(gamma+alpha)+0.5*sin(2*phi)*sin(gamma+alpha)));
+F2 = (m/(0.5*rho*V^2*Sref))*(-g*sin(gamma+alpha)+R*omegae^2*(-cos(phi)^2*...
+    sin(gamma+alpha)+0.5*sin(2*phi)*cos(gamma+alpha)));
+
+f = psiu*((Cx(i+1)-Cx(i))/dalpha - F1) + psiw*((Cz(i+1)-Cz(i))/dalpha...
+    + F2) + psiqt*(((Cm(i+1)-Cm(i))/dalpha)*(m*Lref/Iy));
+
+%Equation f_dot(alpha)
+F11 = (m/(0.5*rho*V^2*Sref))*(g*sin(gamma+alpha)+R*omegae^2*(cos(phi)^2*...
+    sin(gamma+alpha)-0.5*sin(2*phi)*cos(gamma+alpha)));
+F22 = (m/(0.5*rho*V^2*Sref))*(-g*cos(gamma+alpha)-R*omegae^2*(cos(phi)^2*...
+    cos(gamma+alpha)+0.5*sin(2*phi)*sin(gamma+alpha)));
+
+f_dot = psiu*((Cx(i+1)-2*Cx(i)+Cx(i-1))/dalpha^2 + F11) + psiw*((Cz(i+1)...
+    -2*Cz(i)+Cz(i-1))/dalpha^2+ F22) + psiqt*(((Cm(i+1)-2*Cm(i)+Cm(i-1))...
+    /dalpha^2)*(m*Lref/Iy));
+
+
+N = 1000; % ? of Iterations
+err = 0.001; x0 = 0;
+[alpha] = NRaphson(f,f_dot,N,err,x0);

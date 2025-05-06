@@ -1,48 +1,77 @@
-function [A,M,MG1 ,CL,CD,Cm] = aerodynamics(h,Maero,Vabs,rg1,Mg,alfa,beta)
-% = = = = = = = = = = = = = = == = == == == = == == == = == == == = == =
+% ********************************************************
 % Function Aerodynamics
-% Provision of Aerodynamic Forces and Moments in Body Fixed Coordinates
-% = = = = = = = = = = = = = = == = == == == = == == == = == == == = == =
+% Aerodynamic Forces and Moments in Body Fixed Coordinates
+% ********************************************************
 
-[m,Sref,Lref,rhos,gs,bet,omegae,rearth,V00,a1X,CmX,CLX,CDX,b1 X,CyX,CnX] = constants;
+function [A,M,MG1,CL,CD,Cm]=aerodynamics(h,Maero,Vabs,rg1,Mg,alfa,beta)
+[m,Sref,Lref,rhos,gs,bet,omegae,rearth,V00,alX,CmX,CLX,CDX,b1X,CyX,CnX]=constants;
+
 arc = pi/180.;
 
-% * * * * * * * * * * * * ** * ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** *
-% Generation of Aerodynamics of Space Vehicle  (check this part, is the eq. correcect or not)
-% * * * * * * * * * * * * ** * ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** *
-rho = rhos * exp(-bet*h);
-g = gs * (rearth/rg1) * 2;
-norm = rho/2.*Vabs * 2*Sref;
+% ********************************************************
+% Generation of Aerodynamics of Space Vehicle
+% ********************************************************
+
+% Density Model (1)
+% H=10351.8-(0.0368512).*h-(1.02368e-5).*h.^2+(2.63363e-10).*h.^3;
+% rho = rhos.*exp(-h./H);
+% % Density Model (2) - Old
+rho = rhos*exp(-bet*h);
+% %End Density Model
+
+% Gravity Model with Hight
+g = gs.*(rearth./rg1).^2;  % rg1 = h + rearth
+% End Gravity Model
+
+% Force Normalization
+norm = rho/2.*Vabs^2*Sref;
+% End Force Normalization
+
+% Convert Degree-to-Radian
 algr = alfa/arc;
 begr = beta/arc;
+% End Convert Degree-to-Radian
 
-% * * * * * * * * * * * * ** * ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** *
+% ********************************************************
 % Bank Angle Factor
-% * * * * * * * * * * * * ** * ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** *
+% ********************************************************
+
 mue = 0.4;
 
-% * * * * * * * * * * * * ** * ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** *
-% X-38 Longitudinal and Lateral Aero dynamics
-% * * * * * * * * * * * * ** * ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** *
-CL = interpl(a1X,CLX,algr,'cubic')* mue;
-CD = interpl(a1X,CDX,algr,'cubic');
-Cm = interpl(a1X,CmX,algr,'cubic');
-CQ = interpl(b1X,CyX,begr,'cubic');
-Cn = interpl(b1X,CnX,begr,'cubic');
+% ********************************************************
+% Longitudinal and Lateral Aerodynamics
+% ********************************************************
+CL = interp1(alX,CLX,algr,'cubic')*mue;
+CD = interp1(alX,CDX,algr,'cubic');
+Cm = interp1(alX,CmX,algr,'cubic');
+CQ = interp1(b1X,CyX,begr,'cubic');
+Cn = interp1(b1X,CnX,begr,'cubic');
 Cll = 0.;
+
+% Forces Value
 aa(1) = -CD;
-aa(2) = CQ ;
-aa(3) = -CL ;
-A = norm * Maero * aa';
-ma(1) = Cll* Lref;
-ma(2) = Cm * Lref;
-ma(3) = Cn * Lref;
-M = norm * ma';
+aa(2) =  CQ;
+aa(3) = -CL;
+
+% Non-dimentional Forces
+A = norm*Maero*aa';
+
+% Moments Values
+ma(1) = Cll*Lref;
+ma(2) = Cm *Lref;
+ma(3) = Cn *Lref;
+
+% Non-dimentional Moments
+M = norm*ma';
+
+% Gravity Force in Inertial System coordinate
 G(1) = 0.;
 G(2) = 0.;
-G(3) = m*g ;
-MG1 = Mg*G';
+G(3) = m*g;
 
-% * * * * * * * * * * * * ** * ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** * ** **
-% End of Function Aerodynamics
-% * * * * * * * * * * * * ** * ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** * ** **
+% Gravity Forces in Body coordinate
+MG1=Mg*G';
+
+% ********************************************************
+% End of Function Aerodynamics 
+% ********************************************************
