@@ -2,23 +2,23 @@
 % Function "Initiala" Provides and Generates Intitial Data
 % ********************************************************
 
-function [u1,v1,w1,phisn,thetasn,psisn,hn,phin,thetan]=initiala
+function [u1,v1,w1,phisn,thetasn,psisn,hn,phin,thetan,alfa]=initiala
 
 % ********************************************************
 % Matrix Transforming from Geodetic to Body Fixed System
 % ********************************************************
 
 arc     = pi/180.;
-Vtot    = 7606.28;            % Flight Speed
-chie    = -2.6022*arc;      % horizontal flight path angle
-gamma   = -3.0*arc;         % Vertical flight path angle 
-phisn   = 0.*arc;          % phi'   - euler angle
-thetasn = 27.0*arc;        % theta' - euler angle
-psisn   = 90.*arc;         % psi'   - euler angle
-hn      = 121920;             % Hight of Flight 
-phin    = 0;     % phi    - latitude
-thetan  = 0;    % theta  - longitude
 
+Vtot    = 1890;
+chie    = 0*arc;
+gamma   = 0*arc;
+phisn   = 0.*arc;
+thetasn = 10.0*arc;
+psisn   = 90.*arc;
+hn      = 30000;
+phin    = 55*arc;
+thetan  = 33*arc;
 
 Mg(1,1) = cos(psisn)*cos(thetasn);
 Mg(1,2) = sin(psisn)*cos(thetasn);
@@ -40,6 +40,8 @@ Vb = Mg*Vg';
 u1   = Vb(1);
 v1   = Vb(2);
 w1   = Vb(3);
+uvb = sqrt(u1.*u1 + v1.*v1 + w1.*w1);
+alfa = atan(w1/uvb);
 
 % ********************************************************
 % End of Function Initiala
